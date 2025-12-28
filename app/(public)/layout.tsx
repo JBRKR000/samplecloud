@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
-import "./styles/globals.css";
+import "../styles/globals.css";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -15,12 +15,12 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-    title: "Audiolab",
-    description: "Audiolab",
+    title: "SampleCloud",
+    description: "SampleCloud",
     icons: {
-        icon: "/main.ico"
+        icon: "/logo.ico"
     }
-};
+};  
 
 export default function RootLayout({
     children,
@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
    return (
     <html lang="pl" className={`${orbitron.variable} ${inter.variable}`}>
-      <body className="bg-background text-primary-foreground font-body">
+      <body className=" bg-background text-primary-foreground font-body">
         {children}
       </body>
     </html>

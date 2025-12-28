@@ -1,4 +1,4 @@
-@tailwind utilities;
+@import "tailwindcss";
 
 @theme {
   --color-background:  #0F1115;
@@ -17,10 +17,11 @@
   --color-destructive: #E57373;
 
   --color-sidebar:     #0B0D12;
-  --color-sidebar-primary: #F5A623;
+
+  /* DODAJ to, bo używasz text-primary-foreground */
+  --color-primary-foreground: #E6E9F2;
 }
 
 body {
   font-family: var(--font-inter), sans-serif;
-  background-color: var(--color-background);
 }
