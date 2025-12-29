@@ -6,14 +6,14 @@ export default function AuthPage() {
     return (
         <>
         <PreauthHeader/>
-        <HeroLanding />
-        <AuthForm />
-        
-        <div>
-            <h1 className="text-primary">Here will be the Auth Page with dynamic login and registration forms</h1>
+        <div className="flex flex-col md:flex-row min-h-[calc(100vh-80px)]">
+            <div className="w-full md:w-2/3">
+                <HeroLanding />
+            </div>
+            <div className="w-full md:w-1/3 bg-background/50 border-l-0 md:border-l border-border/20 border-t md:border-t-0">
+                <AuthForm />
+            </div>
         </div>
-        
-        
         </>
     );
     }
