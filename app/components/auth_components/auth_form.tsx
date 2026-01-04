@@ -1,8 +1,9 @@
 'use client';
-import { Chromium, Eye, EyeOff  } from "lucide-react";
+import { Chromium, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import checkPassword from "@/app/(lib)/services/checkPassword";
+import { useAlert } from "@/app/(lib)/api/contextAPI";
 
 export default function AuthForm() {
 
@@ -17,12 +18,23 @@ export default function AuthForm() {
         confirmPassword: "",
     });
     const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const {addAlert} = useAlert();
+
+    const checkSubmission = () => {
+        if (isRegister) {
+            if (agreeToTerms && checkPassword(formData.password)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 
     const RegisterFields = [
         { label: "Username", type: "text", name: "username", placeholder: "username" },
         { label: "Email", type: "email", name: "email", placeholder: "email@example.com" },
         { label: "Password", type: "password", name: "password", placeholder: "" },
-        { label: "Confirm Password", type: "password", name: "confirmPassword", placeholder: ""},
+        { label: "Confirm Password", type: "password", name: "confirmPassword", placeholder: "" },
     ];
 
     const LoginFields = [
@@ -37,8 +49,14 @@ export default function AuthForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: HANDLE SUBMISSION LOGIC
-        console.log(formData);
+        if(isRegister && !checkSubmission()){
+            addAlert("Please ensure all fields are correctly filled and terms are agreed.", 'error');
+            return;
+        }
+        if(isLogin && !checkSubmission()){
+            addAlert("Please ensure all fields are correctly filled.", 'error');
+            return;
+        }
     };
 
     const tabVariants = {
@@ -48,7 +66,7 @@ export default function AuthForm() {
 
     const formVariants = {
         hidden: { opacity: 0, x: 20 },
-        visible: { opacity: 1, x: 0, transition: { duration: 0.1} },
+        visible: { opacity: 1, x: 0, transition: { duration: 0.1 } },
         exit: { opacity: 0, x: -20, transition: { duration: 0.1 } }
     };
 
@@ -65,17 +83,17 @@ export default function AuthForm() {
 
     const itemVariants = {
         hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.4 }}
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
     };
 
     return (
-        <motion.div 
+        <motion.div
             className="min-h-screen bg-background flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
         >
-            <motion.div 
+            <motion.div
                 className="w-full max-w-md"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -88,11 +106,10 @@ export default function AuthForm() {
                             setIsLogin(true);
                             setIsRegister(false);
                         }}
-                        className={`flex-1 py-4 text-center font-medium transition-colors ${
-                            isLogin
+                        className={`flex-1 py-4 text-center font-medium transition-colors ${isLogin
                                 ? "text-accent-500 border-b-2 border-accent-500"
                                 : "text-slate-400"
-                        }`}
+                            }`}
                         animate={isLogin ? "active" : "inactive"}
                         variants={tabVariants}
                         whileHover={{ scale: 1.05 }}
@@ -105,11 +122,10 @@ export default function AuthForm() {
                             setIsRegister(true);
                             setIsLogin(false);
                         }}
-                        className={`flex-1 py-4 text-center font-medium transition-colors ${
-                            isRegister
+                        className={`flex-1 py-4 text-center font-medium transition-colors ${isRegister
                                 ? "text-accent-500 border-b-2 border-accent-500"
                                 : "text-slate-400"
-                        }`}
+                            }`}
                         animate={isRegister ? "active" : "inactive"}
                         variants={tabVariants}
                         whileHover={{ scale: 1.05 }}
@@ -123,7 +139,7 @@ export default function AuthForm() {
                 <form onSubmit={handleSubmit}>
                     <AnimatePresence mode="wait">
                         {isLogin && (
-                            <motion.div 
+                            <motion.div
                                 key="login"
                                 className="space-y-6"
                                 variants={formVariants}
@@ -131,7 +147,7 @@ export default function AuthForm() {
                                 animate="visible"
                                 exit="exit"
                             >
-                                <motion.div 
+                                <motion.div
                                     className="space-y-6"
                                     variants={containerVariants}
                                     initial="hidden"
@@ -179,7 +195,7 @@ export default function AuthForm() {
                         )}
 
                         {isRegister && (
-                            <motion.div 
+                            <motion.div
                                 key="register"
                                 className="space-y-6"
                                 variants={formVariants}
@@ -187,7 +203,7 @@ export default function AuthForm() {
                                 animate="visible"
                                 exit="exit"
                             >
-                                <motion.div 
+                                <motion.div
                                     className="space-y-6"
                                     variants={containerVariants}
                                     initial="hidden"
@@ -227,7 +243,7 @@ export default function AuthForm() {
                                             id="terms"
                                             checked={agreeToTerms}
                                             onChange={(e) => setAgreeToTerms(e.target.checked)}
-                                            className="w-4 h-4 accent-amber-500"
+                                            className="w-4 h-4 accent-accent-100"
                                         />
                                         <label htmlFor="terms" className="ml-2 text-slate-400 text-sm">
                                             I agree to Terms & Conditions
@@ -239,11 +255,6 @@ export default function AuthForm() {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         variants={itemVariants}
-                                        onClick={()=>{
-                                            !agreeToTerms && alert("You must agree to the Terms & Conditions to create an account.");
-                                            !checkPassword(formData.password) && alert("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
-
-                                        }}
                                     >
                                         Create Account
                                     </motion.button>
@@ -253,8 +264,8 @@ export default function AuthForm() {
                     </AnimatePresence>
                 </form>
 
-                
-                <motion.div 
+
+                <motion.div
                     className="flex items-center my-6"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -265,8 +276,8 @@ export default function AuthForm() {
                     <div className="flex-1 border-t border-slate-700"></div>
                 </motion.div>
 
-                
-                <motion.button 
+
+                <motion.button
                     className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 py-3 rounded transition-colors"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

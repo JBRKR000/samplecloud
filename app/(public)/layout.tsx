@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import "../styles/globals.css";
+import AlertProvider from "../(lib)/api/contextAPI";
+import { AlertDisplay } from "../components/other/alert_display";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -28,9 +30,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
    return (
-    <html lang="pl" className={`${orbitron.variable} ${inter.variable}`}>
+    <html lang="en" className={`${orbitron.variable} ${inter.variable}`}>
       <body className=" bg-background text-primary-foreground font-body">
-        {children}
+        <AlertProvider>
+          <AlertDisplay />
+          {children}
+        </AlertProvider>
       </body>
     </html>
   );
