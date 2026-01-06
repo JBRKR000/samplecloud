@@ -1,0 +1,8 @@
+Project techstack:
+
+- Next.js
+- Typescript
+- TailwindCSS
+- Prisma ORM
+- React.js
+- BetterAuth
