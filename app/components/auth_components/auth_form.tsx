@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import checkPassword from "@/app/(lib)/services/checkPassword";
 import { useAlert } from "@/app/(lib)/api/contextAPI";
-import { signIn, signUp } from "@/app/(lib)/services/auth/auth-client";
+import { authClient, signIn, signUp } from "@/app/(lib)/services/auth/auth-client";
 import { useRouter } from "next/navigation";
 
 export default function AuthForm() {
@@ -336,6 +336,9 @@ export default function AuthForm() {
                     transition={{ delay: 0.4, duration: 0.5 }}
                     whileHover={{ scale: 1.02, backgroundColor: "#1e293b" }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={async ()=>{
+                       await authClient.signIn.social({ provider: "google"})
+                    }}
                 >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <Chromium color="currentColor" opacity="0.2" />

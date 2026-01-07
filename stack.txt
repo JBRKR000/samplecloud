@@ -6,3 +6,4 @@ Project techstack:
 - Prisma ORM
 - React.js
 - BetterAuth
+- Integration with OAuth 2.0 (Google)

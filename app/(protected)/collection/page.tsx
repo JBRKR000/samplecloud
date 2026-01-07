@@ -1,7 +1,7 @@
 'use client';
 
 import { signOut } from "@/app/(lib)/services/auth/auth-client";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function collectionPage() {
 

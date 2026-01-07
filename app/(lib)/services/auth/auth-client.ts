@@ -1,3 +1,9 @@
+import { createAuthClient } from "better-auth/client";
+
+export const authClient = createAuthClient({
+    baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+});
+
 export async function signUp(payload: {email : string, name: string, password: string}){
 
     const res = await fetch("/api/auth/sign-up/email",
