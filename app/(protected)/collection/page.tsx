@@ -1,12 +1,15 @@
 'use client';
 
 import { signOut } from "@/app/(lib)/services/auth/auth-client";
+import { useRouter } from "next/router";
 
 export default function collectionPage() {
 
+    const router = useRouter();
+
     const handlleSignOut = async () => {
         await signOut();
-        window.location.href = "/";
+        router.push("/");
     }
 
     return (

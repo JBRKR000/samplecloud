@@ -5,9 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import checkPassword from "@/app/(lib)/services/checkPassword";
 import { useAlert } from "@/app/(lib)/api/contextAPI";
 import { signIn, signUp } from "@/app/(lib)/services/auth/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function AuthForm() {
 
+    
+    const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
     const [isRegister, setIsRegister] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +70,7 @@ export default function AuthForm() {
                 try {
                     await signIn({email: formData.email, password: formData.password});
                     addAlert("Account created and logged in successfully!", 'success');
+                    router.push("/dashboard");
                 } catch (error) {
                     addAlert("Registration successful, but login failed!", 'error');
                 }
@@ -78,6 +82,7 @@ export default function AuthForm() {
             try {
                 await signIn({email: formData.email, password: formData.password});
                 addAlert("Logged in successfully!", 'success');
+                router.push("/dashboard");
             } catch (error) {
                 addAlert("Login failed!", 'error');
             }
