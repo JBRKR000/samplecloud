@@ -6,6 +6,11 @@ import { useRouter } from 'next/navigation';
 export default function HeroSection() {
   const router = useRouter();
 
+  const handleGetStartedClick = () => {
+    router.push("/dashboard")
+  }
+
+
   return (
     <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -73,7 +78,7 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <button
-            onClick={() => router.push('/auth')}
+            onClick={() => handleGetStartedClick()}
             className="px-8 py-4 bg-accent text-background font-bold rounded-lg hover:bg-accent/90 transition-all duration-300 hover:shadow-lg active:scale-95"
           >
             Get Started Now

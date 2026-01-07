@@ -1,42 +1,24 @@
-import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
-import "../styles/globals.css";
-import AlertProvider from "../(lib)/api/contextAPI";
-import { AlertDisplay } from "../components/other/alert_display";
+import Sidebar from "../components/main_components/sidebar";
+import PostAuthHeader from "../components/main_components/postauth_header";
+import BottomPlayer from "../components/main_components/bottom_player";
+import RightPanel from "../components/main_components/right_panel";
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-inter',
-});
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-orbitron',
-});
-
-export const metadata: Metadata = {
-    title: "SampleCloud",
-    description: "SampleCloud",
-    icons: {
-        icon: "/logo.ico"
-    }
-};  
-
-export default function RootLayout({
+export default function ProtectedLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
    return (
-    <html lang="en" className={`${orbitron.variable} ${inter.variable}`}>
-      <body className=" bg-background text-primary-foreground font-body">
-        <AlertProvider>
-          <AlertDisplay />
+    <div className="flex flex-col h-screen overflow-hidden">
+      <PostAuthHeader />
+      <div className="flex flex-1 overflow-hidden pt-16 pb-24">
+        <Sidebar />
+        <main className="flex-1 ml-48 mr-64 overflow-y-auto">
           {children}
-        </AlertProvider>
-      </body>
-    </html>
+        </main>
+        <RightPanel />
+      </div>
+      <BottomPlayer />
+    </div>
   );
 }
