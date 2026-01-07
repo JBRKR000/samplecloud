@@ -1,5 +1,5 @@
 export default function checkPassword(password:string):boolean{
-    const regex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/
+    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[.!@#$%^&*?\-]).{8,}$/
     return regex.test(password)
 }
     // Has minimum 8 characters in length.

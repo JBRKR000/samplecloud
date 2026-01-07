@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import checkPassword from "@/app/(lib)/services/checkPassword";
 import { useAlert } from "@/app/(lib)/api/contextAPI";
+import { signIn, signUp } from "@/app/(lib)/services/auth/auth-client";
 
 export default function AuthForm() {
 
@@ -20,15 +21,70 @@ export default function AuthForm() {
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const {addAlert} = useAlert();
 
+    const checkPasswordEquals = () => {
+        return formData.password === formData.confirmPassword;
+    }
+
     const checkSubmission = () => {
         if (isRegister) {
-            if (agreeToTerms && checkPassword(formData.password)) {
-                return true;
-            } else {
+            if (!agreeToTerms) {
+                addAlert("You must agree to the terms and conditions.", 'error');
                 return false;
             }
+            if (!checkPassword(formData.password)) {
+                addAlert("Password does not meet complexity requirements.", 'error');
+                return false;
+            }
+            if (!checkPasswordEquals()) {
+                addAlert("Passwords do not match.", 'error');
+                return false;
+            }
+            if (!(formData.email && formData.username && formData.password && formData.confirmPassword)) {
+                addAlert("Please fill in all required fields.", 'error');
+                return false;
+            }
+            return true;    
         }
+        if (isLogin) {
+            if (!(formData.email && formData.password)) {
+                addAlert("Please fill in all required fields.", 'error');
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if(!checkSubmission()){
+            return;
+        }
+        if(isRegister){
+            try {
+                await signUp({email: formData.email, name: formData.username, password: formData.password});
+                try {
+                    await signIn({email: formData.email, password: formData.password});
+                    addAlert("Account created and logged in successfully!", 'success');
+                } catch (error) {
+                    addAlert("Registration successful, but login failed!", 'error');
+                }
+            } catch (error) {
+                addAlert("Registration failed!", 'error');
+            }
+        }
+        if(isLogin){
+            try {
+                await signIn({email: formData.email, password: formData.password});
+                addAlert("Logged in successfully!", 'success');
+            } catch (error) {
+                addAlert("Login failed!", 'error');
+            }
+        }
+    };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const RegisterFields = [
         { label: "Username", type: "text", name: "username", placeholder: "username" },
@@ -47,17 +103,8 @@ export default function AuthForm() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if(isRegister && !checkSubmission()){
-            addAlert("Please ensure all fields are correctly filled and terms are agreed.", 'error');
-            return;
-        }
-        if(isLogin && !checkSubmission()){
-            addAlert("Please ensure all fields are correctly filled.", 'error');
-            return;
-        }
-    };
+    
+
 
     const tabVariants = {
         active: { color: "#7EA6FF", borderBottomColor: "#7EA6FF" },
