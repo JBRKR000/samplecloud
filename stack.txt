@@ -7,3 +7,4 @@ Project techstack:
 - React.js
 - BetterAuth
 - Integration with OAuth 2.0 (Google)
+- Framer Motion (Motion.dev)
