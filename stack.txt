@@ -1,10 +1,28 @@
-Project techstack:
+TECHNOLOGIES & TOOLS
 
-- Next.js
-- Typescript
-- TailwindCSS
-- Prisma ORM
-- React.js
-- BetterAuth
-- Integration with OAuth 2.0 (Google)
-- Framer Motion (Motion.dev)
+Frontend & Frameworks
+- Next.js 16
+- React 19
+- TypeScript 5
+- TailwindCSS 4
+- Framer Motion
+
+Backend & Database
+- Node.js
+- Prisma ORM 7
+- PostgreSQL
+- Next.js API Routes
+
+Authentication & Security
+- BetterAuth 1.4
+- OAuth 2.0 (Google)
+- Session Management
+
+UI & Design
+- Lucide React
+- React Icons
+- PostCSS
+
+Development Tools
+- ESLint 9
+- Git & Version Control

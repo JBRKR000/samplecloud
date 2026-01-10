@@ -2,6 +2,7 @@
 
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface SampleInfo {
   name: string;
@@ -33,114 +34,191 @@ export default function RightPanel() {
   const [sample] = useState<SampleInfo>(defaultSample);
   const [showPanel, setShowPanel] = useState(true);
 
+  const containerVariants = {
+    hidden: { opacity: 0, x: 20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5 }
+    }
+  };
+
   if (!showPanel) return null;
 
   return (
-    <div className="fixed top-0 right-0 bottom-24 w-64 bg-secondary border-l border-border overflow-y-auto">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="h-full w-full bg-linear-to-b from-secondary via-secondary/98 to-secondary/95 border-l border-border/30 backdrop-blur-xl overflow-hidden flex flex-col"
+    >
       {/* Header */}
-      <div className="sticky top-0 bg-secondary border-b border-border px-6 py-4 flex items-center justify-between">
-        <h3 className="font-medium text-primary-foreground text-sm">Sample Info</h3>
-        <button
-          onClick={() => setShowPanel(false)}
-          className="p-1 hover:bg-card rounded transition-colors"
+      <div className="shrink-0 bg-secondary/50 border-b border-border/30 px-6 py-4 flex items-center justify-between">
+        <motion.h3 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="font-semibold text-primary-foreground text-sm tracking-wide"
         >
-          <X className="w-5 h-5 text-primary-foreground" />
-        </button>
+          Sample Info
+        </motion.h3>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setShowPanel(false)}
+          className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-muted-foreground hover:text-primary-foreground"
+          title="Close panel"
+        >
+          <X className="w-4 h-4" />
+        </motion.button>
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-6">
+      <div className="overflow-y-auto flex-1 space-y-0">
         {/* Waveform Display */}
-        <div className="bg-card rounded-lg p-4 h-20 flex items-center justify-center">
-          <div className="flex items-center justify-center gap-1 h-full">
-            {Array.from({ length: 40 }).map((_, i) => {
-              // Seeded pseudo-random for consistent hydration
-              const seed = i * 2.654435761;
-              const random = Math.sin(seed) * 10000;
-              const height = (random - Math.floor(random)) * 100;
-              
-              return (
-                <div
-                  key={i}
-                  className="flex-1 bg-primary/30 rounded-sm"
-                  style={{
-                    height: `${height}%`,
-                  }}
-                />
-              );
-            })}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="px-6 py-6 space-y-2"
+        >
+          <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold mb-3">Waveform</div>
+          <div className="bg-card/50 border border-border/30 rounded-lg p-3 h-24 flex items-center justify-center backdrop-blur-sm">
+            <div className="flex items-center justify-center gap-0.5 h-full w-full">
+              {Array.from({ length: 50 }).map((_, i) => {
+                const seed = i * 2.654435761;
+                const random = Math.sin(seed) * 10000;
+                const height = (random - Math.floor(random)) * 100;
+                
+                return (
+                  <div
+                    key={i}
+                    className="flex-1 bg-linear-to-t from-accent/40 to-accent/20 rounded-sm hover:from-accent/60 hover:to-accent/40 transition-colors"
+                    style={{
+                      height: `${height}%`,
+                      minHeight: '2px',
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Metadata */}
-        <div className="space-y-3">
-          <div className="text-xs uppercase tracking-wider text-muted mb-3">Details</div>
+        {/* Details Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="px-6 py-6 border-t border-border/20 space-y-4"
+        >
+          <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold">Details</div>
           
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">Duration</span>
-            <span className="text-sm font-medium text-primary-foreground">{sample.duration}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">Duration</span>
+              <span className="text-sm font-medium text-primary-foreground">{sample.duration}</span>
+            </div>
+            <div className="border-b border-border/10"></div>
+
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">BPM</span>
+              <span className="text-sm font-medium text-primary-foreground">{sample.bpm}</span>
+            </div>
+            <div className="border-b border-border/10"></div>
+
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">Key</span>
+              <motion.span 
+                whileHover={{ scale: 1.05 }}
+                className="text-sm font-bold text-accent px-2 py-1 rounded bg-accent/10"
+              >
+                {sample.key}
+              </motion.span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Format Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="px-6 py-6 border-t border-border/20 space-y-4"
+        >
+          <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold">Format</div>
+          
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">Sample Rate</span>
+              <span className="text-sm font-medium text-primary-foreground">{sample.sampleRate}</span>
+            </div>
+            <div className="border-b border-border/10"></div>
+
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">Channels</span>
+              <span className="text-sm font-medium text-primary-foreground">{sample.channels}</span>
+            </div>
+            <div className="border-b border-border/10"></div>
+
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-muted-foreground/80">Format</span>
+              <span className="text-sm font-medium text-primary-foreground">{sample.format}</span>
+            </div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">BPM</span>
-            <span className="text-sm font-medium text-primary-foreground">{sample.bpm}</span>
+          <div className="border-t border-border/20 pt-4 mt-4 space-y-1 text-xs text-muted-foreground/70">
+            <div>{sample.dateAdded}</div>
+            <div>{sample.fileSize}</div>
           </div>
+        </motion.div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">Key</span>
-            <span className="text-sm font-medium text-accent">{sample.key}</span>
-          </div>
-
-          <div className="border-t border-border pt-3"></div>
-
-          <div className="text-xs uppercase tracking-wider text-muted mb-3">Format</div>
-
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">Sample Rate</span>
-            <span className="text-sm font-medium text-primary-foreground">{sample.sampleRate}</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">Channels</span>
-            <span className="text-sm font-medium text-primary-foreground">{sample.channels}</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted">Format</span>
-            <span className="text-sm font-medium text-primary-foreground">{sample.format}</span>
-          </div>
-
-          <div className="border-t border-border pt-3"></div>
-
-          <div className="text-xs text-muted">{sample.dateAdded}</div>
-          <div className="text-xs text-muted">{sample.fileSize}</div>
-        </div>
-
-        {/* Tags */}
-        <div className="border-t border-border pt-6">
-          <div className="text-xs uppercase tracking-wider text-muted mb-3">Tags</div>
+        {/* Tags Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          className="px-6 py-6 border-t border-border/20 space-y-4"
+        >
+          <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold">Tags</div>
           <div className="flex flex-wrap gap-2">
-            {sample.tags.map((tag) => (
-              <button
+            {sample.tags.map((tag, i) => (
+              <motion.button
                 key={tag}
-                className="px-3 py-1 bg-card hover:bg-primary/10 rounded text-xs text-primary-foreground transition-colors"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.25 + i * 0.05 }}
+                whileHover={{ scale: 1.05, backgroundColor: 'var(--color-accent)' }}
+                className="px-3 py-1.5 bg-card/70 hover:bg-accent/20 rounded-lg text-xs text-primary-foreground/90 transition-all border border-border/20 hover:border-accent/30"
               >
                 {tag}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Actions */}
-        <div className="border-t border-border pt-6 space-y-2">
-          <button className="w-full py-2 bg-primary hover:bg-primary/90 text-sidebar rounded-lg text-sm font-medium transition-colors">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="px-6 py-6 border-t border-border/20 space-y-3 mt-auto"
+        >
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-2.5 bg-accent hover:bg-accent/90 text-secondary rounded-lg text-sm font-semibold transition-all shadow-lg shadow-accent/20"
+          >
             Download
-          </button>
-          <button className="w-full py-2 bg-card hover:bg-secondary border border-border text-primary-foreground rounded-lg text-sm font-medium transition-colors">
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-2.5 bg-card/70 hover:bg-secondary border border-border/30 text-primary-foreground rounded-lg text-sm font-semibold transition-all hover:border-border/50"
+          >
             Edit Info
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

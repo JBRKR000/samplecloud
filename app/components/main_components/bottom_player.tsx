@@ -1,6 +1,6 @@
 'use client';
 
-import { Speaker, ChevronLeft, ChevronRight, Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast, Repeat, Shuffle } from 'lucide-react';
+import {Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast, Repeat, Shuffle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -29,7 +29,7 @@ export default function BottomPlayer() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' }
+      transition: { duration: 0.5 }
     }
   };
 
@@ -122,12 +122,12 @@ export default function BottomPlayer() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="fixed bottom-0 left-48 right-0 h-24 bg-linear-to-r from-secondary via-secondary/95 to-secondary/90 border-t border-border/30 backdrop-blur-xl flex items-center justify-between px-8 z-50"
+      className="h-16 sm:h-20 md:h-24 bg-linear-to-r from-secondary via-secondary/95 to-secondary/90 border-t border-border/30 backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between px-2 sm:px-4 md:px-8 z-50 shrink-0 gap-2 sm:gap-0"
     >
       {/* Track Info */}
       <motion.div
         variants={trackInfoVariants}
-        className="flex items-center gap-4 w-56 shrink-0"
+        className="hidden sm:flex items-center gap-2 sm:gap-4 sm:w-56 shrink-0 min-w-0"
       >
         {/* Track Details */}
         <div className="min-w-0 flex-1">
@@ -163,19 +163,19 @@ export default function BottomPlayer() {
       </motion.div>
 
       {/* Controls & Timeline */}
-      <div className="flex-1 flex flex-col items-center gap-3 mx-8">
+        <div className="flex-1 flex flex-col items-center gap-1 sm:gap-3 sm:mx-8 min-w-0 w-full sm:w-auto">
         {/* Playback Controls */}
-        <div className="flex items-center gap-6">
-
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
           <motion.button
             variants={controlButtonVariants}
             initial="rest"
             whileHover="hover"
             whileTap="tap"
-            className="p-2 text-primary-foreground"
+            onClick={()=>{setIsRepeat(!isRepeat)}}
           >
 
-            <Repeat className="w-4 h-4" />
+            <Repeat className={`${isRepeat ? 'text-accent' : 'text-primary-foreground'} w-3 h-3 sm:w-4 sm:h-4`} />
+            
           </motion.button>
 
           <motion.button
@@ -187,7 +187,7 @@ export default function BottomPlayer() {
             onHoverEnd={() => setHoveredControl(null)}
             className="p-2 text-primary-foreground"
           >
-            <ChevronFirst className="w-6 h-6" />
+            <ChevronFirst className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
           </motion.button>
 
           <motion.button
@@ -200,9 +200,9 @@ export default function BottomPlayer() {
           >
             <motion.div>
               {isPlaying ? (
-                <Pause className="w-6 h-6 ml-1" />
+                <Pause className="w-5 h-5 sm:w-6 sm:h-6 ml-1" />
               ) : (
-                <Play className="w-6 h-6 ml-1" />
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 ml-1" />
               )}
             </motion.div>
           </motion.button>
@@ -216,7 +216,7 @@ export default function BottomPlayer() {
             onHoverEnd={() => setHoveredControl(null)}
             className="p-2 text-primary-foreground"
           >
-            <ChevronLast className="w-6 h-6" />
+            <ChevronLast className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
           </motion.button>
 
           <motion.button
@@ -224,16 +224,17 @@ export default function BottomPlayer() {
             initial="rest"
             whileHover="hover"
             whileTap="tap"
+            onClick={() => setIsShuffle(!isShuffle)}
             className="p-2 text-primary-foreground"
           >
 
-            <Shuffle className="w-4 h-4" />
+            <Shuffle className={`${isShuffle ? 'text-accent' : 'text-primary-foreground'} w-3 h-3 sm:w-4 sm:h-4`} />
           </motion.button>
 
         </div>
 
         {/* Timeline */}
-        <div className="w-full flex items-center gap-3">
+        <div className="w-full flex items-center gap-1 sm:gap-2 md:gap-3">
           <span className="text-xs text-muted-foreground font-medium w-10">{formattedTime}</span>
 
           <motion.div
@@ -273,7 +274,7 @@ export default function BottomPlayer() {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
-        className="flex items-center gap-4 px-5 py-3 rounded-lg w-56 shrink-0"
+        className="hidden md:flex items-center gap-2 md:gap-4 px-2 md:px-5 py-2 md:py-3 rounded-lg md:w-56 shrink-0"
       >
         <motion.div
           className="shrink-0"
