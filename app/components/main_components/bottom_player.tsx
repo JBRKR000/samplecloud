@@ -4,6 +4,7 @@ import {Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast
 import { useState, useEffect, useRef, use } from 'react';
 import { motion } from 'framer-motion';
 import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
+import { set } from 'better-auth';
 
 
 export default function BottomPlayer() {
@@ -28,8 +29,9 @@ export default function BottomPlayer() {
   const [isHoveredVolume, setIsHoveredVolume] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
+  const [actualDuration, setActualDuration] = useState<number | null>(null);
 
-  const totalDuration = 240;
+  const totalDuration = actualDuration !== null ? actualDuration : (currentTrack ? currentTrack.duration : 0);
   const currentTime = Math.floor((progress / 100) * totalDuration);
   const minutes = Math.floor(currentTime / 60);
   const seconds = currentTime % 60;
@@ -72,6 +74,11 @@ export default function BottomPlayer() {
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     const percent = ((e.clientX - rect.left) / rect.width) * 100;
     setProgress(Math.max(0, Math.min(100, percent)));
+
+    if(audioRef.current && totalDuration > 0){
+      const newTime = (percent / 100 ) * totalDuration;
+      audioRef.current.currentTime = newTime;
+    }
   };
 
   const handleProgressMouseDown = () => {
@@ -130,18 +137,23 @@ export default function BottomPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
 
-  // Sync audio element with currentTrack and isPlaying state
+  // Sync audio element with currentTrack
   useEffect(() => {
     if(!audioRef.current || !currentTrack) return;
-      audioRef.current.src = currentTrack.audioUrl
-      if(isPlaying){
-        audioRef.current.play().catch((error) => {
-          console.error("Error playing audio:", error);
-        });
-      }else{
-        audioRef.current.pause();
-      }
-    },[currentTrack, isPlaying]);
+    audioRef.current.src = currentTrack.audioUrl;
+  }, [currentTrack]);
+
+  // Handle play/pause state
+  useEffect(() => {
+    if(!audioRef.current) return;
+    if(isPlaying){
+      audioRef.current.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }else{
+      audioRef.current.pause();
+    }
+  }, [isPlaying]);
 
   // Update volume when it changes
   useEffect(() => {
@@ -155,42 +167,58 @@ export default function BottomPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     const handleTimeUpdate = () => {
-      const newProgress = (audio.currentTime / audio.duration) * 100;
-      setProgress(newProgress);
+      if (audio.duration && !isNaN(audio.duration)) {
+        const newProgress = (audio.currentTime / audio.duration) * 100;
+        setProgress(newProgress);
+      }
     };
     audio.addEventListener('timeupdate', handleTimeUpdate);
     return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
   }, [setProgress]);
       
-
+ // Load actual duration of the track
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
-
     const handleLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration)) {
-        usePlayerStore.setState({
-          currentTrack: {
-            ...currentTrack,
-            duration: Math.round(audio.duration)
-          }
-        });
+        setActualDuration(Math.round(audio.duration));
       }
     };
-
     const handleError = () => {
       console.error('Error loading audio metadata');
     };
-
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('error', handleError);
-    
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('error', handleError);
     };
-  }, []);
+  }, [currentTrack?.audioUrl]);
+
+  useEffect(() => {
+    setActualDuration(null);
+  }, [currentTrack?.id]);
     
+  useEffect(() => {
+  const audio = audioRef.current;
+  if (!audio) return;
+  
+  const handleEnded = () => {
+    if (isRepeat) {
+      audio.currentTime = 0;
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      })
+    } else {
+      setProgress(0);
+      setIsPlaying(false);
+    }
+  };
+  
+  audio.addEventListener('ended', handleEnded);
+  return () => audio.removeEventListener('ended', handleEnded);
+}, [setProgress, setIsPlaying, isRepeat]);
 
   return (
     <motion.div
@@ -219,7 +247,7 @@ export default function BottomPlayer() {
             transition={{ delay: 0.05 }}
             className="text-xs text-muted-foreground/70"
           >
-            {currentTrack ? `Duration: ${Math.floor(currentTrack.duration / 60)}:${(currentTrack.duration % 60).toString().padStart(2, '0')}` : '—'}
+            {currentTrack ? `Duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}` : '—'}
           </motion.p>
         </div>
 
@@ -340,7 +368,7 @@ export default function BottomPlayer() {
             />
           </motion.div>
 
-          <span className="text-xs text-muted-foreground font-medium w-10 text-right">4:00</span>
+          <span className="text-xs text-muted-foreground font-medium w-10 text-right">{totalDuration > 0 ? `${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}` : '0:00'}</span>
         </div>
       </div>
 
