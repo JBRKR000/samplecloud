@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Music, Clock, Heart, Tag, FolderOpen, Cloud } from 'lucide-react';
+import { Music, Clock, Heart, Tag, FolderOpen, Cloud, Icon, Settings2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -13,6 +13,7 @@ const menuItems = [
   { icon: FolderOpen, label: 'Collections', href: '/collection' },
   { icon: Tag, label: 'Tags', href: '/tags' },
   { icon: Cloud, label: 'Cloud Storage', href: '/cloud' },
+  { icon: Settings2, label: 'Settings', href: '/settings' },
 ];
 
 export default function Sidebar() {
@@ -126,7 +127,7 @@ export default function Sidebar() {
           <div className="text-xs uppercase tracking-wider text-accent font-medium mb-4">Organization</div>
           
           <div className="space-y-1">
-            {menuItems.slice(3, 6)
+            {menuItems.slice(3, 7)
             .map((item, i) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;

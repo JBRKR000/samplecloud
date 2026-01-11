@@ -22,7 +22,7 @@ export default function PostAuthHeader({ onMenuClick }: { onMenuClick?: () => vo
         <input
           type="text"
           placeholder="Search samples, tags, keys..."
-          className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-primary-foreground text-sm placeholder-muted focus:outline-none focus:border-primary transition-colors"
+          className="w-full px-4 py-2 bg-secondary border border-border rounded-lg text-primary-foreground text-sm placeholder-accent/40 focus:outline-none focus:border-accent transition-colors"
         />
       </div>
 

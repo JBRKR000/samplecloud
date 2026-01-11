@@ -1,6 +1,6 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { ArrowLeftFromLine, ArrowRightFromLine } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -32,45 +32,85 @@ const defaultSample: SampleInfo = {
 
 export default function RightPanel() {
   const [sample] = useState<SampleInfo>(defaultSample);
-  const [showPanel, setShowPanel] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const containerVariants = {
-    hidden: { opacity: 0, x: 20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.5 }
-    }
+    expanded: { scaleX: 1, opacity: 1 },
+    collapsed: { scaleX: 0, opacity: 0 },
   };
 
-  if (!showPanel) return null;
+  const contentVariants = {
+    expanded: { opacity: 1, transition: { delay: 0.15 } },
+    collapsed: { opacity: 0 },
+  };
+
+  const buttonVariants = {
+    expanded: { 
+      borderRadius: '0.5rem',
+      width: 'auto',
+      padding: '0.5rem 1rem',
+      position: 'relative' as const,
+    },
+    collapsed: { 
+      borderRadius: '9999px',
+      width: '3rem',
+      height: '3rem',
+      padding: '0',
+      position: 'absolute' as const,
+      right: '-1.5rem',
+      top: '1rem',
+    },
+  };
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="h-full w-full bg-linear-to-b from-secondary via-secondary/98 to-secondary/95 border-l border-border/30 backdrop-blur-xl overflow-hidden flex flex-col"
-    >
-      {/* Header */}
-      <div className="shrink-0 bg-secondary/50 border-b border-border/30 px-6 py-4 flex items-center justify-between">
-        <motion.h3 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-semibold text-primary-foreground text-sm tracking-wide"
-        >
-          Sample Info
-        </motion.h3>
+    <div className="relative h-full flex-1">
+      {/* Toggle Button - Positioned for collapsed state */}
+      {!isExpanded && (
         <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setShowPanel(false)}
-          className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-muted-foreground hover:text-primary-foreground"
-          title="Close panel"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="absolute right-0 top-4 w-14 h-14 rounded-full flex items-center justify-center bg-accent text-secondary opacity-80 transition-all z-50 border-2 border-accent/30"
+          style={{ right: '-1.75rem' }}
+          title="Expand panel"
         >
-          <X className="w-4 h-4" />
+          <ArrowLeftFromLine className="w-6 h-6" />
         </motion.button>
-      </div>
+      )}
+
+      {/* Panel Content */}
+      <motion.div
+        initial="expanded"
+        animate={isExpanded ? 'expanded' : 'collapsed'}
+        variants={containerVariants}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{ originX: 1 }}
+        className="h-full bg-linear-to-b from-secondary via-secondary/98 to-secondary/95 border-l border-border/30 backdrop-blur-xl overflow-hidden flex flex-col"
+      >
+        {/* Header */}
+        <div className="shrink-0 bg-secondary/50 border-b border-border/30 px-6 py-4 flex items-center justify-between">
+          <motion.h3 
+            animate={isExpanded ? 'expanded' : 'collapsed'}
+            variants={contentVariants}
+            className="font-semibold text-primary-foreground text-sm tracking-wide"
+          >
+            Sample Info
+          </motion.h3>
+          {isExpanded && (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-muted-foreground hover:text-primary-foreground"
+              title="Collapse panel"
+            >
+              <ArrowRightFromLine className="w-4 h-4" />
+            </motion.button>
+          )}
+        </div>
 
       {/* Content */}
       <div className="overflow-y-auto flex-1 space-y-0">
@@ -219,6 +259,7 @@ export default function RightPanel() {
           </motion.button>
         </motion.div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
