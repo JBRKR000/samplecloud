@@ -7,7 +7,7 @@ export default function HeroSection() {
   const router = useRouter();
 
   const handleGetStartedClick = () => {
-    router.push("/dashboard")
+    router.push("/allSamples")
   }
 
 

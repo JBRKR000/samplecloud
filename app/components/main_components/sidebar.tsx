@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 const menuItems = [
-  { icon: Music, label: 'All Samples', href: '/dashboard', count: '4.2k' },
+  { icon: Music, label: 'All Samples', href: '/allSamples', count: '4.2k' },
   { icon: Clock, label: 'Recent', href: '/recent' },
   { icon: Heart, label: 'Favorites', href: '/favorites', count: '128' },
   { icon: FolderOpen, label: 'Collections', href: '/collection' },

@@ -58,7 +58,7 @@ export default function PricingCards() {
     const router = useRouter();
 
     const handlePlanSelect = () =>{
-        router.push('/dashboard');
+        router.push('/allSamples');
     }
 
     return (

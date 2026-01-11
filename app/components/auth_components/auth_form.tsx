@@ -70,7 +70,7 @@ export default function AuthForm() {
                 try {
                     await signIn({email: formData.email, password: formData.password});
                     addAlert("Account created and logged in successfully!", 'success');
-                    router.push("/dashboard");
+                    router.push("/allSamples");
                 } catch (error) {
                     addAlert("Registration successful, but login failed!", 'error');
                 }
@@ -82,7 +82,7 @@ export default function AuthForm() {
             try {
                 await signIn({email: formData.email, password: formData.password});
                 addAlert("Logged in successfully!", 'success');
-                router.push("/dashboard");
+                router.push("/allSamples");
             } catch (error) {
                 addAlert("Login failed!", 'error');
             }

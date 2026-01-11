@@ -6,6 +6,7 @@ Frontend & Frameworks
 - TypeScript 5
 - TailwindCSS 4
 - Framer Motion
+- Zustand
 
 Backend & Database
 - Node.js

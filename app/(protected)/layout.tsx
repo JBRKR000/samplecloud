@@ -11,7 +11,6 @@ export default function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
    return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -22,11 +21,11 @@ export default function ProtectedLayout({
       
       {/* Main Layout */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <PostAuthHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <PostAuthHeader/>
         
         <div className="flex flex-1 overflow-hidden">
           {/* Main Content */}
-          <main className="flex-1 overflow-y-auto px-4 md:px-8 md:mr-64">
+          <main className="flex-1 overflow-hidden">
             {children}
           </main>
           

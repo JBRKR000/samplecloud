@@ -1,14 +1,25 @@
 'use client';
 
 import {Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast, Repeat, Shuffle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { motion } from 'framer-motion';
+import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
+
 
 export default function BottomPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [volume, setVolume] = useState(80);
+  
+  const {
+    currentTrack,
+    isPlaying,
+    setIsPlaying,
+    progress,
+    setProgress,
+    volume,
+    setVolume,
+    isFavorite,
+    setIsFavorite,
+  } = usePlayerStore();
+
   const [prevVolume, setPrevVolume] = useState(80);
   const [hoveredControl, setHoveredControl] = useState<string | null>(null);
   const [isDraggingProgress, setIsDraggingProgress] = useState(false);
@@ -73,8 +84,6 @@ export default function BottomPlayer() {
     setVolume(Number(Math.max(0, Math.min(100, percent)).toFixed(0)));
   };
 
-
-
   const handleMouseMove = (e: MouseEvent) => {
     if (isDraggingProgress) {
       const progressBar = document.querySelector('[data-progress-bar]') as HTMLDivElement;
@@ -117,6 +126,72 @@ export default function BottomPlayer() {
     }
   }, [isDraggingProgress, isDraggingVolume]);
 
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+
+  // Sync audio element with currentTrack and isPlaying state
+  useEffect(() => {
+    if(!audioRef.current || !currentTrack) return;
+      audioRef.current.src = currentTrack.audioUrl
+      if(isPlaying){
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+      }else{
+        audioRef.current.pause();
+      }
+    },[currentTrack, isPlaying]);
+
+  // Update volume when it changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
+  // Progress updater
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handleTimeUpdate = () => {
+      const newProgress = (audio.currentTime / audio.duration) * 100;
+      setProgress(newProgress);
+    };
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
+  }, [setProgress]);
+      
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack) return;
+
+    const handleLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        usePlayerStore.setState({
+          currentTrack: {
+            ...currentTrack,
+            duration: Math.round(audio.duration)
+          }
+        });
+      }
+    };
+
+    const handleError = () => {
+      console.error('Error loading audio metadata');
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('error', handleError);
+    
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('error', handleError);
+    };
+  }, []);
+    
+
   return (
     <motion.div
       initial="hidden"
@@ -136,7 +211,7 @@ export default function BottomPlayer() {
             animate={{ opacity: 1 }}
             className="text-sm font-semibold text-white truncate"
           >
-            Synthesizer_Pluck_Cmin_124
+            {currentTrack ? currentTrack.title : 'No track selected'}
           </motion.p>
           <motion.p
             initial={{ opacity: 0 }}
@@ -144,7 +219,7 @@ export default function BottomPlayer() {
             transition={{ delay: 0.05 }}
             className="text-xs text-muted-foreground/70"
           >
-            4:00 Duration
+            {currentTrack ? `Duration: ${Math.floor(currentTrack.duration / 60)}:${(currentTrack.duration % 60).toString().padStart(2, '0')}` : '—'}
           </motion.p>
         </div>
 
@@ -328,6 +403,8 @@ export default function BottomPlayer() {
 
         <span className="text-xs text-muted-foreground font-medium w-6 text-right">{volume}%</span>
       </motion.div>
+
+      <audio ref={audioRef} crossOrigin="anonymous" />
     </motion.div>
   );
 }
