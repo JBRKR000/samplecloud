@@ -1,14 +1,13 @@
 'use client';
 
 import {Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast, Repeat, Shuffle } from 'lucide-react';
-import { useState, useEffect, useRef, use } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
-import { set } from 'better-auth';
+import { usePlayer } from '@/app/(lib)/hooks/usePlayer';
 
 
 export default function BottomPlayer() {
-  
   const {
     currentTrack,
     isPlaying,
@@ -133,92 +132,16 @@ export default function BottomPlayer() {
     }
   }, [isDraggingProgress, isDraggingVolume]);
 
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-
-  // Sync audio element with currentTrack
-  useEffect(() => {
-    if(!audioRef.current || !currentTrack) return;
-    audioRef.current.src = currentTrack.audioUrl;
-  }, [currentTrack]);
-
-  // Handle play/pause state
-  useEffect(() => {
-    if(!audioRef.current) return;
-    if(isPlaying){
-      audioRef.current.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
-    }else{
-      audioRef.current.pause();
-    }
-  }, [isPlaying]);
-
-  // Update volume when it changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-
-  // Progress updater
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const handleTimeUpdate = () => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        const newProgress = (audio.currentTime / audio.duration) * 100;
-        setProgress(newProgress);
-      }
-    };
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [setProgress]);
-      
- // Load actual duration of the track
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack) return;
-    const handleLoadedMetadata = () => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        setActualDuration(Math.round(audio.duration));
-      }
-    };
-    const handleError = () => {
-      console.error('Error loading audio metadata');
-    };
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('error', handleError);
-    return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('error', handleError);
-    };
-  }, [currentTrack?.audioUrl]);
-
-  useEffect(() => {
-    setActualDuration(null);
-  }, [currentTrack?.id]);
-    
-  useEffect(() => {
-  const audio = audioRef.current;
-  if (!audio) return;
-  
-  const handleEnded = () => {
-    if (isRepeat) {
-      audio.currentTime = 0;
-      audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      })
-    } else {
-      setProgress(0);
-      setIsPlaying(false);
-    }
-  };
-  
-  audio.addEventListener('ended', handleEnded);
-  return () => audio.removeEventListener('ended', handleEnded);
-}, [setProgress, setIsPlaying, isRepeat]);
+  const audioRef = usePlayer({
+    currentTrack,
+    isPlaying,
+    progress,
+    volume,
+    isRepeat,
+    setProgress,
+    setIsPlaying,
+    setActualDuration,
+  });
 
   return (
     <motion.div
