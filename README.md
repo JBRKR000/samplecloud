@@ -1,4 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Samplecloud
+
+A modern web platform for managing, playing, and organizing audio samples with authentication and cloud storage capabilities.
+
+## About
+
+Samplecloud Web is a full-stack audio sample management application built with Next.js. It provides users with features to browse, play, organize, and store audio samples in a personal library with cloud synchronization support.
+
+## Tech Stack
+
+**Frontend:**
+- Next.js 16 (App Router)
+- React 19
+- TypeScript 5
+- TailwindCSS 4
+- Framer Motion (animations)
+- Zustand (state management)
+- Lucide React & React Icons (UI components)
+
+**Backend:**
+- Node.js with Next.js API Routes
+- PostgreSQL (database)
+- Prisma ORM 7 (database client)
+- BetterAuth 1.4 (authentication)
+
+**Development:**
+- ESLint 9
+- TypeScript
+- Git
+
+## Features
+
+- **Authentication & User Accounts** - Secure sign-up/login with OAuth 2.0 support (Google)
+- **Audio Player** - Interactive audio player with progress tracking, volume control, and favorite management
+- **Sample Browser** - Browse and search audio samples organized by collections and tags
+- **Cloud Storage** - Access personal library and synchronized samples across devices
+- **Collections** - Organize samples into custom collections
+- **Favorites** - Mark and manage favorite samples
+- **Recent Tracks** - Quick access to recently played audio
+- **Settings** - User profile and preferences management
 
 ## Getting Started
 
