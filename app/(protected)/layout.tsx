@@ -5,6 +5,7 @@ import PostAuthHeader from "../components/main_components/postauth_header";
 import BottomPlayer from "../components/main_components/bottom_player";
 import RightPanel from "../components/main_components/right_panel";
 import { useState } from "react";
+import KeyboardShortcuts from "../components/other/keyboard_shortcuts";
 
 export default function ProtectedLayout({
     children,
@@ -13,6 +14,7 @@ export default function ProtectedLayout({
 }) {
 
    return (
+    
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <div className="w-56 shrink-0">
@@ -26,6 +28,7 @@ export default function ProtectedLayout({
         <div className="flex flex-1 overflow-hidden">
           {/* Main Content */}
           <main className="flex-1 overflow-hidden">
+            <KeyboardShortcuts />
             {children}
           </main>
           

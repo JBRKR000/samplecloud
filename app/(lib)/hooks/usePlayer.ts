@@ -23,6 +23,8 @@ export function usePlayer({
     setIsPlaying
 }: UseAudioPlayerProps) {
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const isSeeking = useRef<boolean>(false);
+    const lastProgress = useRef<number>(0);
 
     // Sync audio element with currentTrack
     useEffect(() => {
@@ -54,14 +56,30 @@ export function usePlayer({
         const audio = audioRef.current;
         if (!audio) return;
         const handleTimeUpdate = () => {
-            if (audio.duration && !isNaN(audio.duration)) {
+            if (audio.duration && !isNaN(audio.duration) && !isSeeking.current) {
                 const newProgress = (audio.currentTime / audio.duration) * 100;
+                lastProgress.current = newProgress;
                 setProgress(newProgress);
             }
         };
         audio.addEventListener('timeupdate', handleTimeUpdate);
         return () => audio.removeEventListener('timeupdate', handleTimeUpdate);
     }, [setProgress]);
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio || !audio.duration || isNaN(audio.duration)) return;
+        const progressDiff = Math.abs(progress - lastProgress.current);
+        if (progressDiff > 0.5) {
+            isSeeking.current = true;
+            const newTime = (progress / 100) * audio.duration;
+            audio.currentTime = newTime;
+            lastProgress.current = progress;
+            setTimeout(() => {
+                isSeeking.current = false;
+            }, 100);
+        }
+    }, [progress]);
 
     // Load actual duration of the track
     useEffect(() => {

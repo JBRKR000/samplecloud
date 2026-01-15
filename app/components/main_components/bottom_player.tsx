@@ -1,7 +1,7 @@
 'use client';
 
 import {Pause, Play, Volume2, Heart, VolumeX, Volume1, ChevronFirst, ChevronLast, Repeat, Shuffle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
 import { usePlayer } from '@/app/(lib)/hooks/usePlayer';

@@ -6,6 +6,14 @@ interface Track{
     title:string
     audioUrl:string
     duration:number
+    bpm?: number
+    key?:number
+    sampleRate?:string
+    channels?:string
+    format?:string
+    fileSize?:string
+    tags?:string[]
+    dateAdded?:string
 }
 
 interface PlayerStore{

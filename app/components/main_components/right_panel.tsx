@@ -1,8 +1,10 @@
 'use client';
 
 import { ArrowLeftFromLine, ArrowRightFromLine } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
+import WaveSurfer from 'wavesurfer.js';
 
 interface SampleInfo {
   name: string;
@@ -33,6 +35,62 @@ const defaultSample: SampleInfo = {
 export default function RightPanel() {
   const [sample] = useState<SampleInfo>(defaultSample);
   const [isExpanded, setIsExpanded] = useState(true);
+  
+  const { currentTrack, isPlaying, progress, setProgress } = usePlayerStore();
+  
+  const waveformRef = useRef<HTMLDivElement | null>(null);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
+
+  useEffect(() => {
+    if (!waveformRef.current) return;
+
+    wavesurferRef.current = WaveSurfer.create({
+      container: waveformRef.current,
+      waveColor: '#7EA6FF',
+      progressColor: '#7EA6FF',
+      cursorColor: '#FFFFFF',
+      barWidth: 2,
+      barGap: 1,
+      barRadius: 2,
+      height: 96,
+      normalize: true,
+      backend: 'WebAudio',
+      interact: true,
+      hideScrollbar: true,
+    });
+
+    return () => {
+      wavesurferRef.current?.destroy();
+    };
+  }, []);
+  useEffect(() => {
+    if (!wavesurferRef.current || !currentTrack?.audioUrl) return;
+
+    const ws = wavesurferRef.current;
+    
+    // Event listener dla kliknięć na waveform
+    const handleInteraction = (newTime: number) => {
+      const duration = ws.getDuration();
+      if (duration > 0) {
+        const newProgress = (newTime / duration) * 100;
+        setProgress(newProgress);
+      }
+    };
+    
+    ws.on('interaction', handleInteraction);
+    ws.load(currentTrack.audioUrl);
+    
+    return () => {
+      ws.un('interaction', handleInteraction);
+    };
+  }, [currentTrack?.audioUrl, setProgress]);
+
+  useEffect(() => {
+    if (!wavesurferRef.current || !wavesurferRef.current.getDuration()) return;
+
+    const seekTo = progress / 100;
+    wavesurferRef.current.seekTo(seekTo);
+  }, [progress]);
 
   const containerVariants = {
     expanded: { scaleX: 1, opacity: 1 },
@@ -121,27 +179,23 @@ export default function RightPanel() {
           transition={{ delay: 0.1 }}
           className="px-6 py-6 space-y-2"
         >
-          <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold mb-3">Waveform</div>
-          <div className="bg-card/50 border border-border/30 rounded-lg p-3 h-24 flex items-center justify-center backdrop-blur-sm">
-            <div className="flex items-center justify-center gap-0.5 h-full w-full">
-              {Array.from({ length: 50 }).map((_, i) => {
-                const seed = i * 2.654435761;
-                const random = Math.sin(seed) * 10000;
-                const height = (random - Math.floor(random)) * 100;
-                
-                return (
-                  <div
-                    key={i}
-                    className="flex-1 bg-linear-to-t from-accent/40 to-accent/20 rounded-sm hover:from-accent/60 hover:to-accent/40 transition-colors"
-                    style={{
-                      height: `${height}%`,
-                      minHeight: '2px',
-                    }}
-                  />
-                );
-              })}
-            </div>
+          <div className="text-xs uppercase tracking-widest text-accent font-semibold mb-3">Waveform</div>
+          <div 
+            ref={waveformRef}
+            className="bg-card/50 border border-border/30 rounded-lg overflow-hidden backdrop-blur-sm cursor-pointer hover:border-accent/10 transition-colors"
+            title="Click to seek"
+          >
+            {!currentTrack && (
+              <div className="h-24 flex items-center justify-center text-muted-foreground/50 text-xs">
+                No track loaded
+              </div>
+            )}
           </div>
+          {currentTrack && (
+            <div className="text-xs text-muted-foreground/70 mt-2">
+              {currentTrack.title}
+            </div>
+          )}
         </motion.div>
 
         {/* Details Section */}
@@ -156,13 +210,17 @@ export default function RightPanel() {
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2">
               <span className="text-xs text-muted-foreground/80">Duration</span>
-              <span className="text-sm font-medium text-primary-foreground">{sample.duration}</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                {currentTrack?.duration ? `${currentTrack.duration}s` : sample.duration}
+              </span>
             </div>
             <div className="border-b border-border/10"></div>
 
             <div className="flex justify-between items-center py-2">
               <span className="text-xs text-muted-foreground/80">BPM</span>
-              <span className="text-sm font-medium text-primary-foreground">{sample.bpm}</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                {currentTrack?.bpm || sample.bpm}
+              </span>
             </div>
             <div className="border-b border-border/10"></div>
 
@@ -172,7 +230,7 @@ export default function RightPanel() {
                 whileHover={{ scale: 1.05 }}
                 className="text-sm font-bold text-accent px-2 py-1 rounded bg-accent/10"
               >
-                {sample.key}
+                {currentTrack?.key || sample.key}
               </motion.span>
             </div>
           </div>
@@ -190,25 +248,31 @@ export default function RightPanel() {
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2">
               <span className="text-xs text-muted-foreground/80">Sample Rate</span>
-              <span className="text-sm font-medium text-primary-foreground">{sample.sampleRate}</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                {currentTrack?.sampleRate || sample.sampleRate}
+              </span>
             </div>
             <div className="border-b border-border/10"></div>
 
             <div className="flex justify-between items-center py-2">
               <span className="text-xs text-muted-foreground/80">Channels</span>
-              <span className="text-sm font-medium text-primary-foreground">{sample.channels}</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                {currentTrack?.channels || sample.channels}
+              </span>
             </div>
             <div className="border-b border-border/10"></div>
 
             <div className="flex justify-between items-center py-2">
               <span className="text-xs text-muted-foreground/80">Format</span>
-              <span className="text-sm font-medium text-primary-foreground">{sample.format}</span>
+              <span className="text-sm font-medium text-primary-foreground">
+                {currentTrack?.format || sample.format}
+              </span>
             </div>
           </div>
 
           <div className="border-t border-border/20 pt-4 mt-4 space-y-1 text-xs text-muted-foreground/70">
-            <div>{sample.dateAdded}</div>
-            <div>{sample.fileSize}</div>
+            <div>{currentTrack?.dateAdded || sample.dateAdded}</div>
+            <div>{currentTrack?.fileSize || sample.fileSize}</div>
           </div>
         </motion.div>
 
@@ -221,7 +285,7 @@ export default function RightPanel() {
         >
           <div className="text-xs uppercase tracking-widest text-accent/70 font-semibold">Tags</div>
           <div className="flex flex-wrap gap-2">
-            {sample.tags.map((tag, i) => (
+            {(currentTrack?.tags || sample.tags).map((tag, i) => (
               <motion.button
                 key={tag}
                 initial={{ opacity: 0, scale: 0.8 }}
