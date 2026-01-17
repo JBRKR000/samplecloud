@@ -51,6 +51,7 @@ export function usePlayer({
         }
     }, [volume]);
 
+    
     // Progress updater
     useEffect(() => {
         const audio = audioRef.current;

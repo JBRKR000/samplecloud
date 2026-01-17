@@ -20,7 +20,7 @@ export default function BottomPlayer() {
     setIsFavorite,
   } = usePlayerStore();
 
-  const [prevVolume, setPrevVolume] = useState(80);
+  const [prevVolume, setPrevVolume] = useState(volume);
   const [hoveredControl, setHoveredControl] = useState<string | null>(null);
   const [isDraggingProgress, setIsDraggingProgress] = useState(false);
   const [isDraggingVolume, setIsDraggingVolume] = useState(false);
@@ -131,6 +131,10 @@ export default function BottomPlayer() {
       };
     }
   }, [isDraggingProgress, isDraggingVolume]);
+
+  useEffect(() => {
+    setPrevVolume(volume);
+  }, [volume]);
 
   const audioRef = usePlayer({
     currentTrack,

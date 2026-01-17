@@ -1,5 +1,5 @@
-
 import { create } from "zustand"
+import { persist } from "zustand/middleware"
 
 interface Track{
     id:number
@@ -23,7 +23,6 @@ interface PlayerStore{
     volume: number
     isFavorite: boolean
 
-
     setCurrentTrack: (track: Track | null) => void
     setIsPlaying: (playing: boolean) => void
     setProgress: (progress: number) => void
@@ -32,19 +31,27 @@ interface PlayerStore{
     togglePlay: () => void
 }
 
-export const usePlayerStore = create<PlayerStore>((set,get)=> ({
+export const usePlayerStore = create<PlayerStore>()(
+    persist(
+        (set, get) => ({
+            currentTrack: null,
+            isPlaying: false,
+            progress: 0,
+            volume: 80,
+            isFavorite: false,
 
-    currentTrack: null,
-    isPlaying: false,
-    progress: 0,
-    volume: 80,
-    isFavorite: false,
-
-    setCurrentTrack: (track) =>set({currentTrack: track}),
-    setIsPlaying: (playing) => set({isPlaying: playing}),
-    setProgress: (progress) => set({progress}),
-    setVolume: (volume) => set({volume}),
-    setIsFavorite: (favorite) => set({isFavorite:favorite}),
-    togglePlay: () => set((state)=>({isPlaying: !state.isPlaying}))
-
-}))
+            setCurrentTrack: (track) => set({currentTrack: track}),
+            setIsPlaying: (playing) => set({isPlaying: playing}),
+            setProgress: (progress) => set({progress}),
+            setVolume: (volume) => set({volume}),
+            setIsFavorite: (favorite) => set({isFavorite:favorite}),
+            togglePlay: () => set((state) => ({isPlaying: !state.isPlaying}))
+        }),
+        {
+            name: 'player-storage',
+            partialize: (state) => ({
+                volume: state.volume,
+            }),
+        }
+    )
+)
