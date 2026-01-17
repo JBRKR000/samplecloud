@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Music, Clock, Heart, Tag, FolderOpen, Cloud, Icon, Settings2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUIStore } from '@/app/(lib)/store/UIStore';
 import Image from 'next/image';
 
 const menuItems = [
@@ -18,7 +19,7 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-
+  const { setLastTab } = useUIStore();
   const containerVariants = {
     hidden: { opacity: 0, x: -20 },
     visible: {
@@ -82,6 +83,7 @@ export default function Sidebar() {
               >
                 <Link
                   href={item.href}
+                  onClick={()=> {setLastTab(item.label)}}
                   className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all group ${
                     isActive
                       ? 'bg-linear-to-r from-accent/20 via-accent/15 to-accent/10 text-accent shadow-lg shadow-accent/10'
@@ -140,6 +142,7 @@ export default function Sidebar() {
                 >
                   <Link
                     href={item.href}
+                    onClick={()=> {setLastTab(item.label)}}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                       isActive
                         ? 'bg-linear-to-r from-accent/20 via-accent/15 to-accent/10 text-accent shadow-lg shadow-accent/10'

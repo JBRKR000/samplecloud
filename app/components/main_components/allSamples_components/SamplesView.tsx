@@ -16,8 +16,7 @@ interface Sample {
 }
 
 const placeholderSamples: Sample[] = [
-  { id: 1, name: 'F.O.O.L & Waveshaper - Encounter.mp3', type: 'LOOP', bpm: 124, key: 'Cm', time: '4.0s', audioUrl: '/samples/F.O.O.L & Waveshaper - Encounter.mp3' },
-  { id: 2, name: '1.mp3', type: 'ONE-SHOT', bpm: '-', key: '-', time: '8.4s', audioUrl: '/samples/1.mp3' },
+  { id: 1, name: '1.mp3', type: 'LOOP', bpm: 124, key: 'Cm', time: '4.0s', audioUrl: '/samples/1.mp3' }
 ];
 
 const containerVariants = {
