@@ -70,3 +70,20 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Sample {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      SampleType
+  bpm       Int?
+  key       String?
+  time      Float
+  audioUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum SampleType {
+  LOOP
+  ONE_SHOT
+}

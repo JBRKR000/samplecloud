@@ -3,21 +3,22 @@
 import { Play, Music, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePlayerStore } from '@/app/(lib)/store/PlayerStore';
-import { parse } from 'path';
+import { useEffect, useState } from 'react';
+import { getSamples } from '@/app/(lib)/api';
+
+
 
 interface Sample {
-  id: number;
-  name: string;
-  type: 'LOOP' | 'ONE-SHOT';
-  bpm: number | string;
-  key: string;
-  time: string;
-  audioUrl?: string;
+  id: number
+  audioUrl: string
+  bpm: number | null
+  createdAt: Date
+  key: string | null
+  name: string
+  time: number
+  type: 'LOOP' | 'ONE_SHOT'
+  updatedAt: Date
 }
-
-const placeholderSamples: Sample[] = [
-  { id: 1, name: '1.mp3', type: 'LOOP', bpm: 124, key: 'Cm', time: '4.0s', audioUrl: '/samples/1.mp3' }
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,21 +38,30 @@ const rowVariants = {
 };
 
 export default function SamplesView() {
-  const getTypeColor = (type: 'LOOP' | 'ONE-SHOT') => {
+  const [samples, setSamples] = useState<Sample[]>([]);
+  const { setCurrentTrack, currentTrack, setIsPlaying, isPlaying } = usePlayerStore();
+
+
+  useEffect(() => {
+    let fetchSamples = async () => {
+      let response = await getSamples();
+      setSamples(response)
+    }
+    fetchSamples()
+  }, []);
+
+  const getTypeColor = (type: 'LOOP' | 'ONE_SHOT') => {
     return type === 'LOOP'
       ? 'bg-success/15 text-success border-success/30'
       : 'bg-accent/15 text-accent border-accent/30';
   };
 
-
-  const {setCurrentTrack, currentTrack, setIsPlaying, isPlaying} = usePlayerStore();
-
-  const playAudio = (sample: Sample)=>{
-    if(sample.audioUrl){
-      if(currentTrack?.id === sample.id){
+  const playAudio = (sample: Sample) => {
+    if (sample.audioUrl) {
+      if (currentTrack?.id === sample.id) {
         setIsPlaying(!isPlaying);
       }
-      else{
+      else {
         setCurrentTrack({
           id: sample.id,
           title: sample.name,
@@ -63,8 +73,9 @@ export default function SamplesView() {
     }
   }
 
-
   return (
+
+
     <motion.div
       initial="hidden"
       animate="visible"
@@ -93,7 +104,7 @@ export default function SamplesView() {
         animate="visible"
         variants={containerVariants}
       >
-        {placeholderSamples.map((sample, index) => (
+        {samples.map((sample, index) => (
           <motion.div
             key={sample.id}
             variants={rowVariants}
@@ -106,7 +117,7 @@ export default function SamplesView() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="w-6 h-6 flex items-center justify-center rounded text-muted-foreground/50 group-hover:text-accent/70 hover:bg-accent/10 transition-colors shrink-0"
-              onClick={()=>playAudio(sample)}
+              onClick={() => playAudio(sample)}
             >
               {currentTrack?.id === sample.id && isPlaying ? (
                 <Pause className="w-4 h-4 fill-current" />
@@ -159,7 +170,7 @@ export default function SamplesView() {
         variants={rowVariants}
         className="shrink-0 px-6 py-4 border-t border-border/30 bg-secondary/50 text-xs text-muted-foreground/60"
       >
-        Showing {placeholderSamples.length} samples
+        Showing {samples.length} samples
       </motion.div>
     </motion.div>
   );
