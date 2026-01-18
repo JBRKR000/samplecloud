@@ -39,13 +39,24 @@ const rowVariants = {
 
 export default function SamplesView() {
   const [samples, setSamples] = useState<Sample[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { setCurrentTrack, currentTrack, setIsPlaying, isPlaying } = usePlayerStore();
 
 
   useEffect(() => {
     let fetchSamples = async () => {
-      let response = await getSamples();
-      setSamples(response)
+      try {
+        setIsLoading(true);
+        const response = await getSamples();
+        setSamples(response || []);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load samples');
+        setSamples([]);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchSamples()
   }, []);
@@ -98,18 +109,12 @@ export default function SamplesView() {
       </div>
 
       {/* Samples List */}
-      <motion.div
+      <div
         className="flex-1 overflow-y-auto px-6 space-y-1"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
       >
         {samples.map((sample, index) => (
-          <motion.div
+          <div
             key={sample.id}
-            variants={rowVariants}
-            custom={index}
-            whileHover={{ backgroundColor: 'rgba(126, 166, 255, 0.08)' }}
             className="group flex items-center gap-4 px-4 py-3 rounded-lg transition-colors cursor-pointer hover:bg-accent/5"
           >
             {/* Play Button */}
@@ -161,9 +166,9 @@ export default function SamplesView() {
             <div className="w-16 text-center text-sm text-muted-foreground/70">
               {sample.time}
             </div>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
 
       {/* Footer Info */}
       <motion.div
