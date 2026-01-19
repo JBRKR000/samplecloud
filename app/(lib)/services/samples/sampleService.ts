@@ -10,10 +10,13 @@ interface Sample {
     time: number
     type: 'LOOP' | 'ONE_SHOT'
     updatedAt: Date
+    userId: string
 }
 
-export async function getAllSamples(): Promise<Sample[]> {
-    return await prisma.sample.findMany()
+export async function getAllSamples(userId: string): Promise<Sample[]> {
+    return await prisma.sample.findMany({
+        where: {userId:userId}
+    })
 }
 
 export async function getSampleById(id: number): Promise<Sample | null> {
