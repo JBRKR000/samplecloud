@@ -15,7 +15,8 @@ interface Sample {
 
 export async function getAllSamples(userId: string): Promise<Sample[]> {
     return await prisma.sample.findMany({
-        where: {userId:userId}
+        where: {userId:userId},
+        include: { tags: true }
     })
 }
 
